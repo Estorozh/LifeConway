@@ -32,6 +32,9 @@ function onStop() {
 
 function onClear() {
     if (!ctx) return;
+    population = {}
+    checked = {}
+    lastPopulation = {}
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 }
 
@@ -41,7 +44,7 @@ function onFillAuto() {
 }
 
 function onFill() {
-    onClear();
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
     Object.keys(population).forEach((key) => {
         const [x, y] = key.split(":");
         fillRect(x, y);
@@ -49,6 +52,7 @@ function onFill() {
 }
 
 function nextTick() {
+    checked = {};
     lastPopulation = { ...population };
     const arrLastPopulation = Object.keys(lastPopulation);
     history.push(prepareForHistory(population));

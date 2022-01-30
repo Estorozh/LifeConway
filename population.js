@@ -1,10 +1,12 @@
 let population = {};
 let lastPopulation = {};
+let checked = {};
 let allNeighborsCell = [];
 const history = [];
 
 function toogleLife(x, y) {
     const fieldName = getName(x, y);
+
     if (population[fieldName]) {
         delete population[fieldName];
     } else {
@@ -23,7 +25,15 @@ function getNeighbors(x, y) {
 function checkNeighbors(isAddNeighbors) {
     return function (fieldName) {
         const [x, y] = fieldName.split(":");
-        if (x < 0 || x > countCell || y < 0 || y > countRow) return;
+        if (
+            x < 0 ||
+            x > countCell ||
+            y < 0 ||
+            y > countRow ||
+            checked[fieldName]
+        )
+            return;
+
         let countLife = 0;
         const neighbors = getNeighbors(x, y);
 
@@ -42,8 +52,10 @@ function checkNeighbors(isAddNeighbors) {
         }
 
         if (isAddNeighbors) {
-            allNeighborsCell = [...allNeighborsCell, ...neighbors];
+            allNeighborsCell = [...allNeighborsCell, ...neighbors.filter((fieldName) => !lastPopulation[fieldName])];
         }
+        
+        checked[fieldName] = true;
     };
 }
 
@@ -51,7 +63,7 @@ function getPopulateRandom() {
     const newPopulation = {};
     for (let x = 0; x < countCell; x++) {
         for (let y = 0; y < countRow; y++) {
-            if (Math.random() < 0.3) {
+            if (Math.random() < 0.2) {
                 newPopulation[getName(x, y)] = true;
             }
         }
