@@ -1,0 +1,22 @@
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+body {
+    height: 100vh;
+    margin: 0;
+    padding: 5px;
+    user-select: none;
+    display: block;
+    /* overflow: hidden; */
+}
+
+.world {
+    width: 80%;
+    height: 80%;
+    border: 3px solid #3c3c3c;
+    background-color: #fefefe;
+    margin-bottom: 5px;
+}
