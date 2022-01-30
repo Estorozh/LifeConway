@@ -1,10 +1,11 @@
-let interval;
+let interval, countRow, countCell;
 function onResize() {
     [canvas.width, canvas.height] = [world.offsetWidth, world.offsetHeight];
+    calcGrid()
     onFill();
 }
 window.addEventListener("resize", throttle(onResize));
-window.addEventListener("load", onFill);
+window.addEventListener("load", calcGrid, {once: true})
 
 function fillRect(x, y, isClick) {
     if (!ctx) return;
@@ -52,18 +53,10 @@ function nextTick() {
     const arrLastPopulation = Object.keys(lastPopulation);
     history.push(prepareForHistory(population));
 
-    arrLastPopulation.forEach((key) => {
-        const [x, y] = key.split(":");
-        const neighbors = getNeighbors(x, y);
-        allNeighborsCell = [...allNeighborsCell, ...neighbors];
-        checkNeighbors(key, neighbors);
-    });
+    arrLastPopulation.forEach(checkNeighbors(true));
+
     allNeighborsCell = [...new Set(allNeighborsCell)];
-    allNeighborsCell.forEach((neighbor) => {
-        const [x, y] = neighbor.split(":");
-        const neighbors = getNeighbors(x, y);
-        checkNeighbors(neighbor, neighbors);
-    });
+    allNeighborsCell.forEach(checkNeighbors(false));
 
     onFill();
     if (
@@ -72,4 +65,9 @@ function nextTick() {
     ) {
         clearInterval(interval);
     }
+}
+
+function calcGrid() {
+    countCell = canvas.width / CELL_SIZE
+    countRow = canvas.height / CELL_SIZE
 }

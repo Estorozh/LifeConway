@@ -12,45 +12,49 @@ function toogleLife(x, y) {
     }
 }
 
-function changeLife(x, y, isAddLife) {
-    if (isAddLife) {
-        population[getName(x, y)] = true;
-    } else {
-        delete population[getName(x, y)];
-    }
-}
-
 function isAlive(x, y) {
     return !!population[getName(x, y)];
 }
 
 function getNeighbors(x, y) {
-    return NEIGHBORS.map(([diffX, diffY]) => getName(x - diffX, y - diffY)); //todo это можно сделать сразу за один проход массива???
+    return NEIGHBORS.map(([diffX, diffY]) => getName(x - diffX, y - diffY));
 }
 
-function checkNeighbors(fieldName, neighbors) {
-    const [x, y] = fieldName.split(":");
-    let countLife = 0;
-    neighbors.forEach((fieldName) => {
-        if (lastPopulation[fieldName]) {
-            countLife += 1;
+function checkNeighbors(isAddNeighbors) {
+    return function (fieldName) {
+        const [x, y] = fieldName.split(":");
+        if (x < 0 || x > countCell || y < 0 || y > countRow) return;
+        let countLife = 0;
+        const neighbors = getNeighbors(x, y);
+
+        neighbors.forEach((fieldName) => {
+            if (lastPopulation[fieldName]) {
+                countLife += 1;
+            }
+        });
+
+        if (countLife === 3) {
+            population[getName(x, y)] = true;
+        } else {
+            isAlive(x, y) &&
+                countLife !== 2 &&
+                delete population[getName(x, y)];
         }
-    });
-    if (countLife === 3) {
-        population[getName(x, y)] = true;
-    } else {
-        isAlive(x, y) && countLife !== 2 && delete population[getName(x, y)];
-    }
+
+        if (isAddNeighbors) {
+            allNeighborsCell = [...allNeighborsCell, ...neighbors];
+        }
+    };
 }
 
-function getPopulateRandom () {
-    const newPopulation = {}
-    for (let x = 0; x < COUNT_ROW; x++) {
-        for (let y =0; y< COUNT_CELL; y++) {
-            if(Math.random() < .3) {
-                newPopulation[getName(x,y)] = true
+function getPopulateRandom() {
+    const newPopulation = {};
+    for (let x = 0; x < countCell; x++) {
+        for (let y = 0; y < countRow; y++) {
+            if (Math.random() < 0.3) {
+                newPopulation[getName(x, y)] = true;
             }
         }
     }
-    return newPopulation
+    return newPopulation;
 }
