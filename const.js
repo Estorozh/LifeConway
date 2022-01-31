@@ -1,4 +1,4 @@
-let CELL_SIZE = 5;
+const CELL_SIZE = 5;
 const COLOR_ALIVE = "#3c3c3c";
 const COLOR_DIED = "#fefefe";
 const NEIGHBORS = [
