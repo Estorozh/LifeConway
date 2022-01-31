@@ -4,67 +4,54 @@ let checked = {};
 let allNeighborsCell = [];
 let history = [];
 
-const tick = () => {
-    let countNeighbor = 0;
+class Cell {
+    constructor(isAlive) {
+        this.neighbors = [];
+        this.isAlive = isAlive;
+        this.nextState = null;
+        this.color = isAlive ? COLOR_ALIVE : COLOR_DIED
+    }
 
-    neighbors.forEach(
-        (neighbor) =>
-            (neighbor.isAlive)
-    );
+    calcAlive() {
+        let countNeighbor = 0;
 
-    prevState = isAlive
-    if (countNeighbor === 3 || (countNeighbor === 2 && isAlive)) {
-        isAlive = true;
-    } else {
-        isAlive = false;
+        this.neighbors.forEach(
+            (neighbor) => neighbor.isAlive && countNeighbor++
+        );
+
+        if (countNeighbor === 3 || (countNeighbor === 2 && this.isAlive)) {
+            this.nextState = true;
+            this.color = COLOR_ALIVE
+        } else {
+            this.nextState = false;
+            this.color = COLOR_DIED
+        }
+    }
+
+    changeAlive() {
+        this.isAlive = this.nextState;
+    }
+
+    toggleLife() {
+        this.isAlive = !this.isAlive;
+        this.color = this.isAlive ? COLOR_ALIVE : COLOR_DIED
     }
 }
 
-const toggleLife = () => {
-    this.isAlive = !this.isAlive;
-}
-
-function getCell(isAlive) {
-        // this.neighbors = [];
-        // this.prevState = null;
-        // this.isAlive = isAlive;
-
-    // function tick() {
-    //     let countNeighbor = 0;
-
-    //     this.neighbors.forEach(
-    //         (neighbor) =>
-    //             (countNeighbor += neighbor !== this && neighbor.isAlive)
-    //     );
-
-    //     this.prevState = this.isAlive
-    //     if (countNeighbor === 3 || (countNeighbor === 2 && this.isAlive)) {
-    //         this.isAlive = true;
-    //     } else {
-    //         this.isAlive = false;
-    //     }
-    // }
-
-
-    // toogleLife() {
-    //     this.isAlive = !this.isAlive;
-    // }
-    return {
-        isAlive,
-        neighbors: [],
-        prevState: null,
-        toggleLife: toggleLife.bind(this),
-        tick: tick.bind(this)
-    }
-}
-
-//todo рассчитать соседей и записать их сразу
 const getNeighbors = (x, y) => {
-    let neighbors = []
+    let neighbors = [];
     NEIGHBORS.forEach(([diffX, diffY]) => {
-        const nX = x-diffX, nY = y-diffY;
-        if(nX < 0 || nX > countCell || nY < 0 || nY > countRow || !population?.[nX]?.[nY]) return;
-        neighbors.push(population[nX][nY])
+        const nX = x - diffX,
+            nY = y - diffY;
+        if (
+            nX < 0 ||
+            nX > countCell ||
+            nY < 0 ||
+            nY > countRow ||
+            !population?.[nX]?.[nY]
+        )
+            return;
+        neighbors.push(population[nX][nY]);
     });
     return neighbors;
-}
+};
