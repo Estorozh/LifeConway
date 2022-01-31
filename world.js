@@ -1,29 +1,49 @@
 let interval, countRow, countCell;
 function onResize() {
     [canvas.width, canvas.height] = [world.offsetWidth, world.offsetHeight];
-    calcGrid()
+    prepareGame();
     onFill();
 }
 window.addEventListener("resize", throttle(onResize));
-window.addEventListener("load", calcGrid, {once: true})
+window.addEventListener("DOMContentLoaded", prepareGame)
 
-function fillRect(x, y, isClick) {
-    if (!ctx) return;
-    ctx.fillStyle = isAlive(x, y) && isClick ? COLOR_DIED : COLOR_ALIVE;
+function prepareGame() {
+    countCell = canvas.width / CELL_SIZE;
+    countRow = canvas.height / CELL_SIZE;
+
+    for(let x = 0; x < countCell; x++) {
+        population[x] = [];
+        for(let y = 0; y< countRow; y++) {
+            population[x][y] = getCell(Math.random() < 0.3);
+        }
+    }
+
+    run(getNeighbors);
+    onFill()
+}
+
+function fillRect(x, y) {
+    if (!ctx, population[x][y].prevState === population[x][y].isAlive) return;
+    ctx.fillStyle = population[x][y].isAlive ? COLOR_ALIVE : COLOR_DIED;
     ctx.fillRect(x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE);
 }
 
 function clickInWorld(e) {
     const x = Math.floor((e.pageX - this.offsetLeft) / CELL_SIZE);
     const y = Math.floor((e.pageY - this.offsetTop) / CELL_SIZE);
-    fillRect(x, y, true);
-    toogleLife(x, y);
+    population[x][y].toggleLife();
+    fillRect(x, y);
 }
 world.addEventListener("click", clickInWorld);
 
 function onStart() {
-    interval && onStop();
-    interval = setInterval(nextTick, 100);
+    if(interval) {
+        onStop();
+        prepareGame();
+        history = [];
+    }
+    // interval = setInterval(nextTick, 100);
+    nextTick()
 }
 
 function onStop() {
@@ -32,46 +52,33 @@ function onStop() {
 
 function onClear() {
     if (!ctx) return;
-    population = {}
-    checked = {}
-    lastPopulation = {}
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 }
 
 function onFillAuto() {
-    population = getPopulateRandom();
-    onFill();
+    onStop()
+    prepareGame()
+    run((x,y) => population[x][y].isAlive = Math.random < .3)
+    onFill()
 }
 
 function onFill() {
+    console.log(population)
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    Object.keys(population).forEach((key) => {
-        const [x, y] = key.split(":");
-        fillRect(x, y);
-    });
+    run(fillRect)
 }
 
 function nextTick() {
-    checked = {};
-    lastPopulation = { ...population };
-    const arrLastPopulation = Object.keys(lastPopulation);
-    history.push(prepareForHistory(population));
+    const [allDied, lastPopulation] = prepareForHistory(population)
+    history.push(lastPopulation);
+    console.log(population, 'beforetick')
+    run(tick);
+    onFill()
 
-    arrLastPopulation.forEach(checkNeighbors(true));
-
-    allNeighborsCell = [...new Set(allNeighborsCell)];
-    allNeighborsCell.forEach(checkNeighbors(false));
-
-    onFill();
     if (
-        !arrLastPopulation.length ||
+        allDied ||
         history.includes(prepareForHistory(population))
     ) {
         clearInterval(interval);
     }
-}
-
-function calcGrid() {
-    countCell = canvas.width / CELL_SIZE
-    countRow = canvas.height / CELL_SIZE
 }

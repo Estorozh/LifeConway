@@ -1,72 +1,70 @@
-let population = {};
+let population = [];
 let lastPopulation = {};
 let checked = {};
 let allNeighborsCell = [];
-const history = [];
+let history = [];
 
-function toogleLife(x, y) {
-    const fieldName = getName(x, y);
+const tick = () => {
+    let countNeighbor = 0;
 
-    if (population[fieldName]) {
-        delete population[fieldName];
+    neighbors.forEach(
+        (neighbor) =>
+            (neighbor.isAlive)
+    );
+
+    prevState = isAlive
+    if (countNeighbor === 3 || (countNeighbor === 2 && isAlive)) {
+        isAlive = true;
     } else {
-        population[fieldName] = true;
+        isAlive = false;
     }
 }
 
-function isAlive(x, y) {
-    return !!population[getName(x, y)];
+const toggleLife = () => {
+    this.isAlive = !this.isAlive;
 }
 
-function getNeighbors(x, y) {
-    return NEIGHBORS.map(([diffX, diffY]) => getName(x - diffX, y - diffY));
-}
+function getCell(isAlive) {
+        // this.neighbors = [];
+        // this.prevState = null;
+        // this.isAlive = isAlive;
 
-function checkNeighbors(isAddNeighbors) {
-    return function (fieldName) {
-        const [x, y] = fieldName.split(":");
-        if (
-            x < 0 ||
-            x > countCell ||
-            y < 0 ||
-            y > countRow ||
-            checked[fieldName]
-        )
-            return;
+    // function tick() {
+    //     let countNeighbor = 0;
 
-        let countLife = 0;
-        const neighbors = getNeighbors(x, y);
+    //     this.neighbors.forEach(
+    //         (neighbor) =>
+    //             (countNeighbor += neighbor !== this && neighbor.isAlive)
+    //     );
 
-        neighbors.forEach((fieldName) => {
-            if (lastPopulation[fieldName]) {
-                countLife += 1;
-            }
-        });
+    //     this.prevState = this.isAlive
+    //     if (countNeighbor === 3 || (countNeighbor === 2 && this.isAlive)) {
+    //         this.isAlive = true;
+    //     } else {
+    //         this.isAlive = false;
+    //     }
+    // }
 
-        if (countLife === 3) {
-            population[getName(x, y)] = true;
-        } else {
-            isAlive(x, y) &&
-                countLife !== 2 &&
-                delete population[getName(x, y)];
-        }
 
-        if (isAddNeighbors) {
-            allNeighborsCell = [...allNeighborsCell, ...neighbors.filter((fieldName) => !lastPopulation[fieldName])];
-        }
-        
-        checked[fieldName] = true;
-    };
-}
-
-function getPopulateRandom() {
-    const newPopulation = {};
-    for (let x = 0; x < countCell; x++) {
-        for (let y = 0; y < countRow; y++) {
-            if (Math.random() < 0.2) {
-                newPopulation[getName(x, y)] = true;
-            }
-        }
+    // toogleLife() {
+    //     this.isAlive = !this.isAlive;
+    // }
+    return {
+        isAlive,
+        neighbors: [],
+        prevState: null,
+        toggleLife: toggleLife.bind(this),
+        tick: tick.bind(this)
     }
-    return newPopulation;
+}
+
+//todo рассчитать соседей и записать их сразу
+const getNeighbors = (x, y) => {
+    let neighbors = []
+    NEIGHBORS.forEach(([diffX, diffY]) => {
+        const nX = x-diffX, nY = y-diffY;
+        if(nX < 0 || nX > countCell || nY < 0 || nY > countRow || !population?.[nX]?.[nY]) return;
+        neighbors.push(population[nX][nY])
+    });
+    return neighbors;
 }
