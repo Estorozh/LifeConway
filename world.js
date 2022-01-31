@@ -1,23 +1,28 @@
 let interval, countRow, countCell;
 function onResize() {
+    onStop();
     [canvas.width, canvas.height] = [world.offsetWidth, world.offsetHeight];
-    prepareGame();
+    prepareGame(true);
     onFill();
 }
 window.addEventListener("resize", throttle(onResize));
-window.addEventListener("DOMContentLoaded", prepareGame);
+window.addEventListener("DOMContentLoaded", () => prepareGame(false));
 
-function prepareGame() {
+function prepareGame(isSaveState) {
     countCell = canvas.width / CELL_SIZE;
     countRow = canvas.height / CELL_SIZE;
+    const newPopulation = [];
 
     for (let x = 0; x < countCell; x++) {
-        population[x] = [];
+        newPopulation[x] = [];
         for (let y = 0; y < countRow; y++) {
-            population[x][y] = new Cell(false);
+            newPopulation[x][y] = new Cell(
+                !!isSaveState && population[x]?.[y]?.isAlive
+            );
         }
     }
 
+    population = newPopulation;
     run({ fn: getNeighbors, field: "neighbors" });
     onFill();
 }
@@ -38,11 +43,8 @@ function clickInWorld(e) {
 world.addEventListener("click", clickInWorld);
 
 function onStart() {
-    if (interval) {
-        onStop();
-        prepareGame();
-        history = [];
-    }
+    interval && onStop();
+    history = [];
     interval = setInterval(nextTick, 100);
 }
 
@@ -58,7 +60,7 @@ function onClear() {
 
 function onFillAuto() {
     onStop();
-    prepareGame();
+    prepareGame(true);
     run({
         fn: (x, y) => {
             const isAlive = Math.random() < 0.3;
