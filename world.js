@@ -30,7 +30,7 @@ function prepareGame(isSaveState) {
 function fillRect(x, y, clickColor) {
     if (!ctx) return;
     ctx.fillStyle = clickColor || population[x][y].color;
-    ctx.fillRect(x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE);
+    ctx.fillRect((x * CELL_SIZE) - HALF_CELL, (y * CELL_SIZE) - HALF_CELL, CELL_SIZE, CELL_SIZE);
 }
 
 function clickInWorld(e) {
